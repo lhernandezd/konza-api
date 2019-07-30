@@ -13,3 +13,7 @@ This is an API for manage simple projects.
 `npm i`
 
 `npm start`
+
+## Development
+
+`npm run dev`
