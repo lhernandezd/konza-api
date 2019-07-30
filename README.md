@@ -14,6 +14,8 @@ This is an API for manage simple projects.
 
 `npm start`
 
+`cp .env.example .env`
+
 ## Development
 
 `npm run dev`
