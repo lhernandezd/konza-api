@@ -1,5 +1,7 @@
 const express = require('express');
 
+const logger = require('./config/logger');
+
 const app = express();
 const api = require('./api/v1');
 
@@ -8,15 +10,24 @@ app.use('/api', api);
 
 // Not route found middleware
 app.use((req, res, next) => {
-  res.status(404);
+  const message = 'Route not found';
+  const statusCode = 404;
+
+  logger.warn(message);
+
+  res.status(statusCode);
+
   res.json({
-    message: 'Resource not found',
+    message,
   });
 });
 
 // Erro middleware
 app.use((err, req, res, next) => {
   const { message, statusCode = 500 } = err;
+
+  logger.error(message);
+
   res.status(statusCode);
   res.json({
     message,
