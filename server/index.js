@@ -1,5 +1,4 @@
 const express = require('express');
-const morgan = require('morgan');
 const requestId = require('express-request-id')();
 
 const logger = require('./config/logger');
@@ -9,13 +8,7 @@ const api = require('./api/v1');
 
 // Setup Middleware
 app.use(requestId);
-app.use(
-  morgan('combined', {
-    stream: {
-      write: message => logger.info(message),
-    },
-  }),
-);
+app.use(logger.requestId);
 
 app.use('/api/v1', api);
 app.use('/api', api);
