@@ -1,29 +1,33 @@
 exports.create = (req, res, next) => {
-  res.json({
-    message: 'Task created',
-  });
+  const { body = {} } = req;
+  res.json(body);
 };
 
 exports.all = (req, res, next) => {
-  res.json({
-    message: 'List of tasks',
-  });
+  res.json([]);
 };
 
 exports.read = (req, res, next) => {
+  const { params = {} } = req;
+  const { id = 1 } = params;
   res.json({
-    message: 'Read one task',
+    id,
   });
 };
 
 exports.update = (req, res, next) => {
+  const { params = {}, body = {} } = req;
+  const { id = 1 } = params;
   res.json({
-    message: 'Update one task',
+    id,
+    ...body,
   });
 };
 
 exports.delete = (req, res, next) => {
+  const { params = {} } = req;
+  const { id = 1 } = params;
   res.json({
-    message: 'Delete one task',
+    id,
   });
 };
