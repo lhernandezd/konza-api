@@ -1,33 +1,69 @@
-exports.create = (req, res, next) => {
-  const { body = {} } = req;
-  res.json(body);
-};
+const Model = require('./model');
 
-exports.all = (req, res, next) => {
-  res.json([]);
-};
-
-exports.read = (req, res, next) => {
-  const { params = {} } = req;
-  const { id = 1 } = params;
-  res.json({
-    id,
+exports.id = (req, res, next, id) => {
+  Model.findById(id, (err, doc) => {
+    if (err) {
+      next(err);
+    } else if (doc) {
+      req.doc = doc;
+      next();
+    } else {
+      next({
+        statusCode: 404,
+        message: 'Resource not found',
+      });
+    }
   });
 };
 
+exports.create = (req, res, next) => {
+  const { body = {} } = req;
+
+  Model.create(body, (err, doc) => {
+    if (err) {
+      next(err);
+    } else {
+      res.status(201);
+      res.json(doc);
+    }
+  });
+};
+
+exports.all = (req, res, next) => {
+  Model.find({}, (err, docs) => {
+    if (err) {
+      next(err);
+    } else {
+      res.json(docs);
+    }
+  });
+};
+
+exports.read = (req, res, next) => {
+  const { doc = {} } = req;
+  res.json(doc);
+};
+
 exports.update = (req, res, next) => {
-  const { params = {}, body = {} } = req;
-  const { id = 1 } = params;
-  res.json({
-    id,
-    ...body,
+  const { body = {}, doc = {} } = req;
+  Object.assign(doc, body);
+
+  doc.save((err, document) => {
+    if (err) {
+      next(err);
+    } else {
+      res.json(document);
+    }
   });
 };
 
 exports.delete = (req, res, next) => {
-  const { params = {} } = req;
-  const { id = 1 } = params;
-  res.json({
-    id,
+  const { doc = {} } = req;
+  doc.remove((err, document) => {
+    if (err) {
+      next(err);
+    } else {
+      res.json(document);
+    }
   });
 };
