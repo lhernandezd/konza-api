@@ -38,8 +38,14 @@ app.use((req, res, next) => {
 
 // Error middleware
 app.use((err, req, res, next) => {
-  const { message, statusCode = 500, level = 'error' } = err;
+  const { message, level = 'error', name } = err;
+  let { statusCode = 500 } = err;
   const logMessage = `${logger.header(req)} ${statusCode} ${message}`;
+
+  // Validation Errors
+  if (name === 'ValidationError') {
+    statusCode = 422;
+  }
 
   logger[level](logMessage);
 
