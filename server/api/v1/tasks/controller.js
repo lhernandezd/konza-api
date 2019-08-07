@@ -1,6 +1,7 @@
 const HTTP_STATUS = require('http-status-codes');
 
 const Model = require('./model');
+const { paginationParseParams } = require('./../../../utils');
 
 exports.id = async (req, res, next, id) => {
   try {
@@ -35,19 +36,29 @@ exports.create = async (req, res, next) => {
   }
 };
 
-exports.all = async (req, res, next) => {
-  try {
-    const [docs, count] = await Promise.all([Model.find({}), Model.countDocuments()]);
+exports.all = (req, res, next) => {
+  const { query } = req;
+  const { limit, page, skip } = paginationParseParams(query);
 
-    res.json({
-      data: docs,
-      success: true,
-      statusCode: HTTP_STATUS.OK,
-      total: count,
+  Model.find({})
+    .skip(skip)
+    .limit(limit)
+    .exec((err, docs) => {
+      if (err) {
+        next(err);
+      } else {
+        res.json({
+          data: docs,
+          success: true,
+          statusCode: HTTP_STATUS.OK,
+          meta: {
+            limit,
+            skip,
+            page,
+          },
+        });
+      }
     });
-  } catch (error) {
-    next(error);
-  }
 };
 
 exports.read = (req, res, next) => {
