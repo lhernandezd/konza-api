@@ -1,3 +1,5 @@
+const HTTP_STATUS = require('http-status-codes');
+
 const Model = require('./model');
 
 exports.id = (req, res, next, id) => {
@@ -9,7 +11,7 @@ exports.id = (req, res, next, id) => {
       next();
     } else {
       next({
-        statusCode: 404,
+        statusCode: HTTP_STATUS.NOT_FOUND,
         message: 'Resource not found',
       });
     }
@@ -23,8 +25,12 @@ exports.create = (req, res, next) => {
     if (err) {
       next(err);
     } else {
-      res.status(201);
-      res.json(doc);
+      res.status(HTTP_STATUS.CREATED);
+      res.json({
+        data: doc,
+        success: true,
+        statusCode: HTTP_STATUS.CREATED,
+      });
     }
   });
 };
@@ -34,14 +40,22 @@ exports.all = (req, res, next) => {
     if (err) {
       next(err);
     } else {
-      res.json(docs);
+      res.json({
+        data: docs,
+        success: true,
+        statusCode: HTTP_STATUS.OK,
+      });
     }
   });
 };
 
 exports.read = (req, res, next) => {
   const { doc = {} } = req;
-  res.json(doc);
+  res.json({
+    data: doc,
+    success: true,
+    statusCode: HTTP_STATUS.OK,
+  });
 };
 
 exports.update = (req, res, next) => {
@@ -52,7 +66,11 @@ exports.update = (req, res, next) => {
     if (err) {
       next(err);
     } else {
-      res.json(document);
+      res.json({
+        data: document,
+        success: true,
+        statusCode: HTTP_STATUS.OK,
+      });
     }
   });
 };
@@ -63,7 +81,11 @@ exports.delete = (req, res, next) => {
     if (err) {
       next(err);
     } else {
-      res.json(document);
+      res.json({
+        data: document,
+        success: true,
+        statusCode: HTTP_STATUS.OK,
+      });
     }
   });
 };
