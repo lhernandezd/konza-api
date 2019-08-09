@@ -2,11 +2,10 @@ const HTTP_STATUS = require('http-status-codes');
 
 const Model = require('./model');
 
-exports.id = (req, res, next, id) => {
-  Model.findById(id, (err, doc) => {
-    if (err) {
-      next(err);
-    } else if (doc) {
+exports.id = async (req, res, next, id) => {
+  try {
+    const doc = await Model.findById(id);
+    if (doc) {
       req.doc = doc;
       next();
     } else {
@@ -15,38 +14,40 @@ exports.id = (req, res, next, id) => {
         message: 'Resource not found',
       });
     }
-  });
+  } catch (error) {
+    next(error);
+  }
 };
 
-exports.create = (req, res, next) => {
+exports.create = async (req, res, next) => {
   const { body = {} } = req;
 
-  Model.create(body, (err, doc) => {
-    if (err) {
-      next(err);
-    } else {
-      res.status(HTTP_STATUS.CREATED);
-      res.json({
-        data: doc,
-        success: true,
-        statusCode: HTTP_STATUS.CREATED,
-      });
-    }
-  });
+  try {
+    const doc = await Model.create(body);
+    res.status(HTTP_STATUS.CREATED);
+    res.json({
+      data: doc,
+      success: true,
+      statusCode: HTTP_STATUS.CREATED,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-exports.all = (req, res, next) => {
-  Model.find({}, (err, docs) => {
-    if (err) {
-      next(err);
-    } else {
-      res.json({
-        data: docs,
-        success: true,
-        statusCode: HTTP_STATUS.OK,
-      });
-    }
-  });
+exports.all = async (req, res, next) => {
+  try {
+    const [docs, count] = await Promise.all([Model.find({}), Model.countDocuments()]);
+
+    res.json({
+      data: docs,
+      success: true,
+      statusCode: HTTP_STATUS.OK,
+      total: count,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 exports.read = (req, res, next) => {
@@ -58,34 +59,35 @@ exports.read = (req, res, next) => {
   });
 };
 
-exports.update = (req, res, next) => {
+exports.update = async (req, res, next) => {
   const { body = {}, doc = {} } = req;
-  Object.assign(doc, body);
 
-  doc.save((err, document) => {
-    if (err) {
-      next(err);
-    } else {
-      res.json({
-        data: document,
-        success: true,
-        statusCode: HTTP_STATUS.OK,
-      });
-    }
-  });
+  try {
+    Object.assign(doc, body);
+    const updated = await doc.save();
+
+    res.json({
+      data: updated,
+      success: true,
+      statusCode: HTTP_STATUS.OK,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-exports.delete = (req, res, next) => {
+exports.delete = async (req, res, next) => {
   const { doc = {} } = req;
-  doc.remove((err, document) => {
-    if (err) {
-      next(err);
-    } else {
-      res.json({
-        data: document,
-        success: true,
-        statusCode: HTTP_STATUS.OK,
-      });
-    }
-  });
+
+  try {
+    const deleted = await doc.remove();
+
+    res.json({
+      data: deleted,
+      success: true,
+      statusCode: HTTP_STATUS.OK,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
