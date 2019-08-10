@@ -36,29 +36,33 @@ exports.create = async (req, res, next) => {
   }
 };
 
-exports.all = (req, res, next) => {
+exports.all = async (req, res, next) => {
   const { query } = req;
   const { limit, page, skip } = paginationParseParams(query);
 
-  Model.find({})
-    .skip(skip)
-    .limit(limit)
-    .exec((err, docs) => {
-      if (err) {
-        next(err);
-      } else {
-        res.json({
-          data: docs,
-          success: true,
-          statusCode: HTTP_STATUS.OK,
-          meta: {
-            limit,
-            skip,
-            page,
-          },
-        });
-      }
+  try {
+    const all = Model.find()
+      .skip(skip)
+      .limit(limit)
+      .exec();
+    const count = Model.countDocuments();
+
+    const [docs, total] = await Promise.all([all, count]);
+    const pages = Math.ceil(total / limit);
+    res.json({
+      data: docs,
+      success: true,
+      statusCode: HTTP_STATUS.OK,
+      meta: {
+        limit,
+        skip,
+        page,
+        pages,
+      },
     });
+  } catch (error) {
+    next(error);
+  }
 };
 
 exports.read = (req, res, next) => {
