@@ -1,7 +1,8 @@
 const HTTP_STATUS = require('http-status-codes');
 
 const { Model, fields } = require('./model');
-const { paginationParseParams, sortParseParams } = require('./../../../utils');
+const { paginationParseParams } = require('./../../../utils');
+const { sortParseParams, sortCompactToStr } = require('./../../../utils');
 
 exports.id = async (req, res, next, id) => {
   try {
@@ -40,8 +41,7 @@ exports.all = async (req, res, next) => {
   const { query } = req;
   const { limit, page, skip } = paginationParseParams(query);
   const { sortBy, direction } = sortParseParams(query, fields);
-  const sort = {};
-  sort[sortBy] = direction;
+  const sort = sortCompactToStr(sortBy, direction);
 
   try {
     const all = Model.find()
