@@ -1,7 +1,7 @@
 const HTTP_STATUS = require('http-status-codes');
 
-const Model = require('./model');
-const { paginationParseParams } = require('./../../../utils');
+const { Model, fields } = require('./model');
+const { paginationParseParams, sortParseParams } = require('./../../../utils');
 
 exports.id = async (req, res, next, id) => {
   try {
@@ -39,9 +39,13 @@ exports.create = async (req, res, next) => {
 exports.all = async (req, res, next) => {
   const { query } = req;
   const { limit, page, skip } = paginationParseParams(query);
+  const { sortBy, direction } = sortParseParams(query, fields);
+  const sort = {};
+  sort[sortBy] = direction;
 
   try {
     const all = Model.find()
+      .sort(sort)
       .skip(skip)
       .limit(limit)
       .exec();
@@ -54,6 +58,8 @@ exports.all = async (req, res, next) => {
       success: true,
       statusCode: HTTP_STATUS.OK,
       meta: {
+        sortBy,
+        direction,
         limit,
         skip,
         page,
