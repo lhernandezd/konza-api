@@ -25,11 +25,24 @@ const fields = {
   },
 };
 
-const task = new Schema(fields, {
+const references = {
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'user',
+    required: true,
+  },
+  projectId: {
+    type: Schema.Types.ObjectId,
+    ref: 'project',
+  },
+};
+
+const task = new Schema({ ...fields, ...references }, {
   timestamps: true,
 });
 
 module.exports = {
   Model: mongoose.model('task', task),
   fields,
+  references,
 };
