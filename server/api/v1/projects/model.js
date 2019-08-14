@@ -27,10 +27,24 @@ const references = {
 
 const project = new Schema({ ...fields, ...references }, {
   timestamps: true,
+  toJSON: {
+    virtuals: true,
+  },
 });
+
+const virtuals = {
+  tasks: {
+    ref: 'task',
+    localField: '_id',
+    foreignField: 'projectId',
+  },
+};
+
+project.virtual('tasks', virtuals.tasks);
 
 module.exports = {
   Model: mongoose.model('project', project),
   fields,
   references,
+  virtuals,
 };
