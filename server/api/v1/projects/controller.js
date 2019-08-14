@@ -3,6 +3,7 @@ const HTTP_STATUS = require('http-status-codes');
 const { Model, fields, references, virtuals } = require('./model');
 const { paginationParseParams } = require('../../../utils');
 const { sortParseParams, sortCompactToStr } = require('../../../utils');
+const { populateToObject } = require('./../../../utils');
 
 const referencesNames = [
   ...Object.getOwnPropertyNames(references),
@@ -48,14 +49,15 @@ exports.all = async (req, res, next) => {
   const { limit, page, skip } = paginationParseParams(query);
   const { sortBy, direction } = sortParseParams(query, fields);
   const sort = sortCompactToStr(sortBy, direction);
-  const populate = referencesNames.join(' ');
+  const { filters, populate } = filterByNested(params, referencesNames);
+  const populateObject = populateToObject(populate.split(' '), virtuals);
 
   try {
-    const all = Model.find()
+    const all = Model.find(filters)
       .sort(sort)
       .skip(skip)
       .limit(limit)
-      .populate(populate)
+      .populate(populateObject)
       .exec();
     const count = Model.countDocuments();
 
