@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { hash, compare } = require('bcryptjs');
 
 const { Schema } = mongoose;
 
@@ -70,6 +71,19 @@ user.methods.toJSON = function toJSON() {
     delete document[field];
   });
   return document;
+};
+
+// prettier-ignore
+user.pre('save', async function save(next) {
+  if (this.isNew || this.isModified('password')) {
+    this.password = await hash(this.password, 10);
+  }
+  next();
+});
+
+// prettier-ignore
+user.methods.verifyPassword = function verifyPassword(password) {
+  return compare(password, this.password);
 };
 
 module.exports = {
