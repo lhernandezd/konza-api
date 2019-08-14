@@ -1,9 +1,12 @@
 const HTTP_STATUS = require('http-status-codes');
 
-const { Model, fields, references, virtuals } = require('./model');
+const {
+  Model, fields, references, virtuals,
+} = require('./model');
 const { paginationParseParams } = require('../../../utils');
 const { sortParseParams, sortCompactToStr } = require('../../../utils');
 const { populateToObject } = require('./../../../utils');
+const { filterByNested } = require('./../../../utils');
 
 const referencesNames = [
   ...Object.getOwnPropertyNames(references),
@@ -45,7 +48,7 @@ exports.create = async (req, res, next) => {
 };
 
 exports.all = async (req, res, next) => {
-  const { query } = req;
+  const { query = {}, params = {} } = req;
   const { limit, page, skip } = paginationParseParams(query);
   const { sortBy, direction } = sortParseParams(query, fields);
   const sort = sortCompactToStr(sortBy, direction);
