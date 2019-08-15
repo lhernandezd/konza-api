@@ -4,6 +4,8 @@ const { Model, fields } = require('./model');
 const { paginationParseParams } = require('../../../utils');
 const { sortParseParams, sortCompactToStr } = require('../../../utils');
 
+const { signToken } = require('./../auth');
+
 exports.id = async (req, res, next, id) => {
   try {
     const doc = await Model.findById(id);
@@ -26,11 +28,16 @@ exports.signup = async (req, res, next) => {
 
   try {
     const doc = await Model.create(body);
+    const { id } = doc;
+    const token = signToken({ id });
     res.status(HTTP_STATUS.CREATED);
     res.json({
       data: doc,
       success: true,
       statusCode: HTTP_STATUS.CREATED,
+      meta: {
+        token,
+      },
     });
   } catch (error) {
     next(error);
@@ -44,10 +51,15 @@ exports.signin = async (req, res, next) => {
     const user = await Model.findOne({ email });
     const verified = await user.verifyPassword(password);
     if (user && verified) {
+      const { id } = user;
+      const token = signToken({ id });
       res.json({
         data: user,
         success: true,
         statusCode: HTTP_STATUS.OK,
+        meta: {
+          token,
+        },
       });
     } else {
       next({
