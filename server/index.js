@@ -2,13 +2,26 @@ const express = require('express');
 const requestId = require('express-request-id')();
 const bodyParser = require('body-parser');
 const HTTP_STATUS = require('http-status-codes');
+const cors = require('cors');
 
+const config = require('./config');
 const logger = require('./config/logger');
 
 const app = express();
 const api = require('./api/v1');
 
 // # Setup Middleware
+app.use(
+  cors({
+    origin: config.server.origin,
+    methods: ['HEAD', 'OPTIONS', 'GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Accept', 'Content-Type', 'Authorization'],
+  }),
+);
+// Request Id
+app.use(requestId);
+// Log requests
+app.use(logger.requests);
 
 // Parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -16,12 +29,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Parse application/json
 app.use(bodyParser.json());
 
-// Request Id
-app.use(requestId);
-
-// Log requests
-app.use(logger.requests);
-
+// Setup router and routes
 app.use('/api/v1', api);
 app.use('/api', api);
 
@@ -52,7 +60,9 @@ app.use((err, req, res, next) => {
 
   res.status(statusCode);
   res.json({
+    error: true,
     message,
+    statusCode,
   });
 });
 
