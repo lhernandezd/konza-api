@@ -21,7 +21,7 @@ exports.id = async (req, res, next, id) => {
   }
 };
 
-exports.create = async (req, res, next) => {
+exports.signup = async (req, res, next) => {
   const { body = {} } = req;
 
   try {
@@ -32,6 +32,29 @@ exports.create = async (req, res, next) => {
       success: true,
       statusCode: HTTP_STATUS.CREATED,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.signin = async (req, res, next) => {
+  const { body = {} } = req;
+  const { email = '', password = '' } = body;
+  try {
+    const user = await Model.findOne({ email });
+    const verified = await user.verifyPassword(password);
+    if (user && verified) {
+      res.json({
+        data: user,
+        success: true,
+        statusCode: HTTP_STATUS.OK,
+      });
+    } else {
+      next({
+        statusCode: HTTP_STATUS.UNAUTHORIZED,
+        message: 'Invalid email or password',
+      });
+    }
   } catch (error) {
     next(error);
   }

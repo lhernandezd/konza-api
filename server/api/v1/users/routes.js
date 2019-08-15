@@ -5,10 +5,10 @@ const tasksRouter = require('./../tasks/routes');
 
 router.param('id', controller.id);
 
-router
-  .route('/')
-  .get(controller.all)
-  .post(controller.create);
+router.route('/signup').post(controller.signup);
+router.route('/signin').post(controller.signin);
+
+router.route('/').get(controller.all);
 
 router
   .route('/:id')
