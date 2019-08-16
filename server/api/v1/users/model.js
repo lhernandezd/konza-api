@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { hash, compare } = require('bcryptjs');
 const { isEmail, isURL } = require('validator');
+const { body } = require('express-validator');
 
 const { Schema } = mongoose;
 
@@ -36,6 +37,7 @@ const fields = {
     type: String,
     required: true,
     trim: true,
+    min: 6,
   },
   profilePhoto: {
     type: String,
@@ -103,7 +105,10 @@ user.methods.verifyPassword = function verifyPassword(password) {
   return compare(password, this.password);
 };
 
+const sanitizers = [body('firstname').escape(), body('lastname').escape()];
+
 module.exports = {
   Model: mongoose.model('user', user),
   fields,
+  sanitizers,
 };
