@@ -3,18 +3,20 @@ const router = require('express').Router({
 });
 
 const controller = require('./controller');
+const { auth, owner } = require('./../auth');
+const { sanitizers } = require('./model');
 
 router.param('id', controller.id);
 
 router
   .route('/')
   .get(controller.all)
-  .post(controller.create);
+  .post(auth, sanitizers, controller.create);
 
 router
   .route('/:id')
   .get(controller.read)
-  .put(controller.update)
+  .put(auth, owner, sanitizers, controller.update)
   .delete(controller.delete);
 
 module.exports = router;
