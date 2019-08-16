@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { hash, compare } = require('bcryptjs');
+const { isEmail, isURL } = require('validator');
 
 const { Schema } = mongoose;
 
@@ -22,6 +23,14 @@ const fields = {
     trim: true,
     maxlength: 128,
     unique: true,
+    validate: {
+      validator(value) {
+        return isEmail(value);
+      },
+      message(props) {
+        return `${props.value} is not a valid Email`;
+      },
+    },
   },
   password: {
     type: String,
@@ -31,7 +40,15 @@ const fields = {
   profilePhoto: {
     type: String,
     trim: true,
-    default: '',
+    required: true,
+    validate: {
+      validator(value) {
+        return isURL(value);
+      },
+      message(props) {
+        return `${props.value} is not a URL`;
+      },
+    },
   },
 };
 
