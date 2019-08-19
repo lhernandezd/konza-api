@@ -9,7 +9,7 @@ exports.connect = ({
 
   // Required auth
   if (username && password) {
-    dburl = `${protocol}://${username}:${password}@${url}`;
+    dburl = `${protocol}://${username}:${encodeURIComponent(password)}@${url}`;
   } else {
     dburl = `${protocol}://${url}`;
   }
