@@ -10,13 +10,13 @@ router.param('id', controller.id);
 
 router
   .route('/')
-  .get(controller.all)
+  .get(auth, controller.all)
   .post(auth, sanitizers, controller.create);
 
 router
   .route('/:id')
-  .get(controller.read)
+  .get(auth, controller.read)
   .put(auth, owner, sanitizers, controller.update)
-  .delete(controller.delete);
+  .delete(auth, owner, controller.delete);
 
 module.exports = router;
