@@ -9,15 +9,15 @@ const { sanitizers } = require('./model');
 router.param('id', controller.id);
 
 router.route('/signup').post(sanitizers, controller.signup);
-router.route('/signin').post(controller.signin);
+router.route('/signin').post(sanitizers, controller.signin);
 
-router.route('/').get(controller.all);
+router.route('/').get(auth, controller.all);
 
 router
   .route('/:id')
-  .get(controller.read)
+  .get(auth, controller.read)
   .put(auth, me, sanitizers, controller.update)
-  .delete(controller.delete);
+  .delete(auth, me, controller.delete);
 
 router.use('/:userId/tasks', tasksRouter);
 
