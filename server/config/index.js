@@ -3,7 +3,7 @@ require('dotenv').config();
 const config = {
   server: {
     port: process.env.PORT || 3000,
-    origin: (process.env.SERVER_ORIGIN && process.env.SERVER_ORIGIN.split(',')) || '*',
+    origin: (process.env.SERVER_ORIGIN && process.env.SERVER_ORIGIN.split(',')) || "'*'",
   },
   database: {
     protocol: process.env.DATABASE_PROTOCOL,

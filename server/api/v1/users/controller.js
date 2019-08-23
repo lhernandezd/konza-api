@@ -49,7 +49,7 @@ exports.signin = async (req, res, next) => {
   const { email = '', password = '' } = body;
   try {
     const user = await Model.findOne({ email });
-    const verified = await user.verifyPassword(password);
+    const verified = user && (await user.verifyPassword(password));
     if (user && verified) {
       const { id } = user;
       const token = signToken({ id });
